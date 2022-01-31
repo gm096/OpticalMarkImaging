@@ -18,6 +18,7 @@ public class ThresholdFilter implements PixelFilter {
                 }
             }
         }
+        img.setPixels(output);
         return img;
     }
 }
