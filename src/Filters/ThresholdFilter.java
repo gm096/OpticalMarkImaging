@@ -10,7 +10,7 @@ public class ThresholdFilter implements PixelFilter {
         short[][] output = img.getBWPixelGrid();
         for (int i = 0; i < output.length; i++) {
             for (int j = 0; j < output[0].length; j++) {
-                if(output[i][j] < 100){
+                if(output[i][j] < 240){
                     output[i][j] = 0;
                 }
                 else{

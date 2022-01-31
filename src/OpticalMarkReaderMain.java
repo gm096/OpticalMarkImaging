@@ -1,5 +1,6 @@
     import FileIO.PDFHelper;
     import core.DImage;
+    import core.DisplayWindow;
     import processing.core.PImage;
 
     import javax.swing.*;
