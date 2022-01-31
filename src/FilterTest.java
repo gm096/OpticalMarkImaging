@@ -34,6 +34,6 @@ public class FilterTest {
     }
 
     public static int test() {
-        return  1;
+        return 1;
     }
 }
