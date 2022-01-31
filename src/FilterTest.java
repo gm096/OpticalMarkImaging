@@ -32,4 +32,8 @@ public class FilterTest {
 
         DisplayWindow.showFor("assets/page1.png");
     }
+
+    public static int test() {
+        return  1;
+    }
 }
