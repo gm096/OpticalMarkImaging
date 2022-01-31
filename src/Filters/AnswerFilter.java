@@ -12,7 +12,7 @@ public class AnswerFilter {
     }
 
     public DImage processImage(DImage img, ArrayList<String> answers) {
-        ArrayList<String> test = new ArrayList<>();
+        ArrayList<String> testing = new ArrayList<>();
 
         return img;
     }
