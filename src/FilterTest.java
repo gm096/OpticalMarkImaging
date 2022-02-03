@@ -1,8 +1,10 @@
 import FileIO.PDFHelper;
 import Filters.AnswerFilter;
+import Filters.Bubble;
 import Filters.FixedThresholdFilter;
 import Filters.DisplayInfoFilter;
 import Interfaces.PixelFilter;
+import Filters.*;
 import core.DImage;
 import core.DisplayWindow;
 import processing.core.PImage;
@@ -13,9 +15,11 @@ public class FilterTest {
     public static String currentFolder = System.getProperty("user.dir") + "/";
 
     public static void main(String[] args) {
-        // DisplayWindow.showFor("assets/page1.png");
+
 
         RunTheFilter();
+        SaveAndDisplayExample();
+
     }
 
     private static void RunTheFilter() {
@@ -33,8 +37,10 @@ public class FilterTest {
 
     private static void SaveAndDisplayExample() {
         PImage img = PDFHelper.getPageImage("assets/omrtest.pdf", 1);
-        img.save(currentFolder + "assets/page1.png");
-
+        DImage image = new DImage(img);
+        image = new AnswerFilterBubbleSearch().processImage(image);
+        PImage img2 = image.getPImage();
+        img2.save(currentFolder + "assets/page1.png");
         DisplayWindow.showFor("assets/page1.png");
     }
 

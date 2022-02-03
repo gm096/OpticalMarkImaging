@@ -7,7 +7,6 @@ import com.github.sarxos.webcam.Webcam;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.video.Movie;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
