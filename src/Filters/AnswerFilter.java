@@ -5,7 +5,7 @@ import core.DImage;
 import java.util.ArrayList;
 
 public class AnswerFilter {
-    private final int cRadius = 9, dist = (2 * cRadius) + 20; // radius of bubbles and space between
+    private final int cRadius = 9, dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble
     private final int xODist = 285; // dimensions of outer box
     private final int startingX = 75, startingY = 455;
     private final int numAnswers = 5;
