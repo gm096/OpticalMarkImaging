@@ -1,5 +1,6 @@
 import FileIO.PDFHelper;
 import Filters.AnswerFilter;
+import Filters.FixedThresholdFilter;
 import Filters.DisplayInfoFilter;
 import Interfaces.PixelFilter;
 import core.DImage;
@@ -12,7 +13,7 @@ public class FilterTest {
     public static String currentFolder = System.getProperty("user.dir") + "/";
 
     public static void main(String[] args) {
-        // SaveAndDisplayExample();
+        // DisplayWindow.showFor("assets/page1.png");
 
         RunTheFilter();
     }
@@ -24,12 +25,10 @@ public class FilterTest {
 
         System.out.println("Running filter on page 1....");
 
-        ArrayList<String> test = new ArrayList<>();
-        AnswerFilter filter = new AnswerFilter();
-        filter.processImage(img, test);
-        // if you want, you can make a different method
-        // that does the image processing an returns a DTO with
-        // the information you want
+        ArrayList<String> answers = new ArrayList<>();
+
+        AnswerFilter aFilter = new AnswerFilter();
+        aFilter.processImage(img, answers);
     }
 
     private static void SaveAndDisplayExample() {
