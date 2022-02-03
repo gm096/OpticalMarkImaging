@@ -1,32 +1,41 @@
 package Filters;
 
+import Interfaces.PixelFilter;
 import core.DImage;
 
 import java.util.ArrayList;
 
-public class AnswerFilter {
+public class AnswerFilter implements PixelFilter {
     private final int cRadius = 9, dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble
     private final int xODist = 285; // dimensions of outer box
     private final int startingX = 75, startingY = 455;
+    private final int endingX = 4 * xODist + startingX, endingY = 25 * dist + startingY;
     private final int numAnswers = 5;
 
 
     public AnswerFilter() {
-        System.out.println("Filter running...");
+        // System.out.println("Filter running...");
     }
 
-    public DImage processImage(DImage img, ArrayList<String> answers) {
+    @Override
+    public DImage processImage(DImage img) {
         short[][] pixels = img.getBWPixelGrid();
+        short[][][] cChannels = {img.getRedChannel(), img.getGreenChannel(), img.getBlueChannel()};
+        ArrayList<String> answers = new ArrayList<>();
 
-        applyThreshold(pixels, 240);
+        int count = 0;
 
-        for (int c = startingX; c < pixels[0].length; c += xODist) {
-            for (int r = startingY; r < pixels.length; r += dist) {
+        for (int c = startingX; c < endingX; c += xODist) {
+            for (int r = startingY; r < endingY; r += dist) {
                 String ans = getAnswer(pixels, r, c);
                 answers.add(ans);
+                makeBox(cChannels, r, c);
+                // if (count == 47) System.out.println(c + " " + r);
+                // count++;
             }
         }
-        System.out.println(answers);
+        System.out.println(answers.get(47));
+        img.setColorChannels(cChannels[0], cChannels[1], cChannels[2]);
         return img;
     }
 
@@ -38,8 +47,9 @@ public class AnswerFilter {
             // System.out.println((row + cRadius) + " " + (c) + " ");
             sums.add(sum);
         }
+        // if (row == 1291 && col == 360) System.out.println(sums);
         int maxSum = 0;
-        // System.out.println(sums);
+
         for (int i = 0; i < sums.size(); i++) {
             if (sums.get(i) > sums.get(maxSum)) maxSum = i;
         }
@@ -69,6 +79,22 @@ public class AnswerFilter {
                 if (pixels[r][c] > t) pixels[r][c] = 255;
                 else pixels[r][c] = 0;
             }
+        }
+    }
+
+    private void makeBox(short[][][] iChannels, int row, int col) {
+        int[] boxColor = {255, 0, 0};
+        for (int c = 0; c < boxColor.length; c++) {
+            for (int i = row; i <= row + dist; i++) {
+                iChannels[c][i][col] = (short) boxColor[c];
+                iChannels[c][i][col + xODist] = (short) boxColor[c];
+            }
+
+            for (int i = col; i <= col + xODist; i++) {
+                iChannels[c][row][i] = (short) boxColor[c];
+                iChannels[c][row + dist][i] = (short) boxColor[c];
+            }
+
         }
     }
 }
