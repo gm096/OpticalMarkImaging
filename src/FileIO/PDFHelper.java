@@ -21,11 +21,12 @@ public class PDFHelper {
      * @return a List of PImage objects corresponding to the pages of the pdf
      */
     public static ArrayList<PImage> getPImagesFromPdf(String path) {
-        InputStream is = PDFHelper.class.getResourceAsStream(path);
+//        InputStream is = PDFHelper.class.getResourceAsStream(path);
         ArrayList<PImage> images = new ArrayList<PImage>();
         PDDocument pdf = null;
 
         try {
+            InputStream is = new FileInputStream(path);
             pdf = PDDocument.load(is);
         } catch (IOException e) {
             System.out.println("Couldn't load pdf");
