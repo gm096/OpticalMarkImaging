@@ -5,7 +5,7 @@ import core.DImage;
 
 import java.util.ArrayList;
 
-public class AnswerFilter{
+public class AnswerFilter {
     private final int cRadius = 9, dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble
     private final int xODist = 281; // dimensions of outer box
     private final int startingX = 83, startingY = 455;
@@ -13,11 +13,69 @@ public class AnswerFilter{
     private final int numAnswers = 5;
 
 
-    public DImage processImage(DImage img, ArrayList<String> answers) {
+    public DImage processImage(DImage img, ArrayList<String> answers, ArrayList<String> IDs) {
         short[][] pixels = img.getBWPixelGrid();
         short[][] outputPixels = new short[pixels.length / 2][pixels[0].length / 2];
         short[][][] cChannels = {img.getRedChannel(), img.getGreenChannel(), img.getBlueChannel()};
 
+        generateAnswers(pixels, answers, cChannels);
+        generateIDs(pixels, IDs);
+
+        downsampleImage(pixels, outputPixels);
+        img.setPixels(outputPixels);
+        return img;
+    }
+
+    private void generateIDs(short[][] pixels, ArrayList<String> IDs) {
+        // Student ID
+        IDs.add(getStudentID(pixels));
+
+        // Teacher ID
+        IDs.add(getTeacherID(pixels));
+    }
+    
+
+    private String getTeacherID(short[][] pixels) {
+        String teacherID = "";
+        for (int r = 330; r < 330 + (cRadius * 2 * 4) + (3 * 5); r += (cRadius * 2) + 5) {
+            ArrayList<Integer> sums = new ArrayList<>();
+            for (int c = 640; c < 640 + (cRadius * 2 * 10) + (35 * 9); c += 54) {
+                int sum = getSumOfNWPixels(pixels, r, c);
+                sums.add(sum);
+            }
+
+            int maxSum = 0;
+
+            for (int i = 0; i < sums.size(); i++) {
+                if (sums.get(i) > sums.get(maxSum)) maxSum = i;
+            }
+
+            teacherID += (maxSum+1);
+        }
+        return teacherID;
+    }
+
+    private String getStudentID(short[][] pixels) {
+        String studentId = "";
+        for (int r = 330; r < 330 + (cRadius * 2 * 4) + (3 * 5); r += (cRadius * 2) + 5) {
+            ArrayList<Integer> sums = new ArrayList<>();
+            for (int c = 80; c < 80 + (cRadius * 2 * 10) + (35 * 9); c += 54) {
+                int sum = getSumOfNWPixels(pixels, r, c);
+                sums.add(sum);
+            }
+
+            int maxSum = 0;
+
+            for (int i = 0; i < sums.size(); i++) {
+                if (sums.get(i) > sums.get(maxSum)) maxSum = i;
+            }
+
+            studentId += (maxSum+1);
+        }
+        return studentId;
+    }
+
+    private void generateAnswers(short[][] pixels, ArrayList<String> answers, short[][][] cChannels) {
         int count = 1;
 
         for (int c = startingX; c < endingX; c += xODist) {
@@ -27,24 +85,6 @@ public class AnswerFilter{
                 makeBox(cChannels, r, c);
                 count++;
             }
-        }
-
-        downsampleImage(pixels, outputPixels);
-        img.setPixels(outputPixels);
-        return img;
-    }
-
-    private void downsampleImage(short[][] pixels, short[][] outputPixels) {
-        int rc = 0;
-        int cc = 0;
-
-        for (int r = 0; r < pixels.length - 1; r += 2) {
-            for (int c = 0; c < pixels[r].length - 1; c += 2) {
-                outputPixels[rc][cc] = pixels[r][c];
-                cc++;
-            }
-            rc++;
-            cc = 0;
         }
     }
 
@@ -93,12 +133,17 @@ public class AnswerFilter{
         return (arr.length - 1 >= r && arr[0].length - 1 >= c && r >= 0 && c >= 0);
     }
 
-    private void applyThreshold(short[][] pixels, int t) {
-        for (int r = 0; r < pixels.length; r++) {
-            for (int c = 0; c < pixels[0].length; c++) {
-                if (pixels[r][c] > t) pixels[r][c] = 255;
-                else pixels[r][c] = 0;
+    private void downsampleImage(short[][] pixels, short[][] outputPixels) {
+        int rc = 0;
+        int cc = 0;
+
+        for (int r = 0; r < pixels.length - 1; r += 2) {
+            for (int c = 0; c < pixels[r].length - 1; c += 2) {
+                outputPixels[rc][cc] = pixels[r][c];
+                cc++;
             }
+            rc++;
+            cc = 0;
         }
     }
 
