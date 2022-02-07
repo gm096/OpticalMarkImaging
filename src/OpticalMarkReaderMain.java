@@ -33,7 +33,7 @@ public class OpticalMarkReaderMain {
         for (int i = 0; i < allAnswers.size(); i++) {
             ArrayList<Boolean> testGrade = new ArrayList<>();
             for (int j = 0; j < allAnswers.get(i).size(); j++) {
-                if(allAnswers.get(i).get(j) == answerKey.get(j)){
+                if(allAnswers.get(i).get(j).equals(answerKey.get(j))){
                     testGrade.add(true);
                 }
                 else{
@@ -66,6 +66,23 @@ public class OpticalMarkReaderMain {
     }
 
     private static void outputItemAnalysis(ArrayList<ArrayList<Boolean>> testGrades) {
+        int[] itemAnalysis = new int[testGrades.get(0).size()];
+        for (int i = 1; i < testGrades.size(); i++) {
+            for (int j = 0; j < testGrades.get(i).size(); j++) {
+                if(testGrades.get(i).get(j) == false){
+                    itemAnalysis[j]++;
+                }
+            }
+        }
+        try{
+            PrintWriter out = new PrintWriter(new FileWriter("itemanalysis.csv"));
+            for (int i = 0; i < itemAnalysis.length; i++) {
+                out.println(i + ", " + itemAnalysis[i]);
+            }
+            out.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     private static String fileChooser() {
