@@ -13,15 +13,22 @@ public class OpticalMarkReaderMain {
         System.out.println("Loading pdf at " + pathToPdf);
 
         ArrayList<PImage> pdf = PDFHelper.getPImagesFromPdf(pathToPdf);
+
         ArrayList<ArrayList<String>> allAnswers = new ArrayList<>();
-        for (PImage page : pdf) {
-            DImage image = new DImage(page);
-            ArrayList<String> answers = new ArrayList<>();
+        AnswerFilter key = new AnswerFilter();
+        key.processImage(new DImage(pdf.get(0)), allAnswers.get(0));
 
-            AnswerFilter filter = new AnswerFilter();
-            filter.processImage(image, answers);
+        System.out.println(allAnswers.get(0));
 
-        }
+
+//        for (PImage page : pdf) {
+//            DImage image = new DImage(page);
+//            ArrayList<String> answers = new ArrayList<>();
+//
+////            AnswerFilter filter = new AnswerFilter();
+////            filter.processImage(image, answers);
+//
+//        }
     }
 
     private static String fileChooser() {
@@ -33,3 +40,4 @@ public class OpticalMarkReaderMain {
         return file.getAbsolutePath();
     }
 }
+
