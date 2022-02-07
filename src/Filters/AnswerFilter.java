@@ -5,55 +5,75 @@ import core.DImage;
 
 import java.util.ArrayList;
 
-public class AnswerFilter implements PixelFilter {
+public class AnswerFilter{
     private final int cRadius = 9, dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble
-    private final int xODist = 285; // dimensions of outer box
-    private final int startingX = 75, startingY = 455;
+    private final int xODist = 281; // dimensions of outer box
+    private final int startingX = 83, startingY = 455;
     private final int endingX = 4 * xODist + startingX, endingY = 25 * dist + startingY;
     private final int numAnswers = 5;
 
 
-    public AnswerFilter() {
-        // System.out.println("Filter running...");
-    }
-
-    @Override
-    public DImage processImage(DImage img) {
+    public DImage processImage(DImage img, ArrayList<String> answers) {
         short[][] pixels = img.getBWPixelGrid();
+        short[][] outputPixels = new short[pixels.length / 2][pixels[0].length / 2];
         short[][][] cChannels = {img.getRedChannel(), img.getGreenChannel(), img.getBlueChannel()};
-        ArrayList<String> answers = new ArrayList<>();
 
-        int count = 0;
+        int count = 1;
 
         for (int c = startingX; c < endingX; c += xODist) {
             for (int r = startingY; r < endingY; r += dist) {
-                String ans = getAnswer(pixels, r, c);
+                String ans = getAnswer(pixels, r - calcMoE(count), c, count);
                 answers.add(ans);
                 makeBox(cChannels, r, c);
-                // if (count == 47) System.out.println(c + " " + r);
-                // count++;
+                count++;
             }
         }
-        System.out.println(answers.get(47));
-        img.setColorChannels(cChannels[0], cChannels[1], cChannels[2]);
+
+        downsampleImage(pixels, outputPixels);
+        img.setPixels(outputPixels);
         return img;
     }
 
-    private String getAnswer(short[][] pixels, int row, int col) {
+    private void downsampleImage(short[][] pixels, short[][] outputPixels) {
+        int rc = 0;
+        int cc = 0;
+
+        for (int r = 0; r < pixels.length - 1; r += 2) {
+            for (int c = 0; c < pixels[r].length - 1; c += 2) {
+                outputPixels[rc][cc] = pixels[r][c];
+                cc++;
+            }
+            rc++;
+            cc = 0;
+        }
+    }
+
+    private String getAnswer(short[][] pixels, int row, int col, int debug) {
         String[] answers = {"A", "B", "C", "D", "E"};
         ArrayList<Integer> sums = new ArrayList<>();
         for (int c = col + 60; c < col + 60 + (dist * numAnswers); c += dist) {
             int sum = getSumOfNWPixels(pixels, row + cRadius, c);
-            // System.out.println((row + cRadius) + " " + (c) + " ");
+            // if (debug == 74) System.out.println((row + cRadius) + " " + (c) + " ");
             sums.add(sum);
         }
-        // if (row == 1291 && col == 360) System.out.println(sums);
+
+        // if (debug == 50) System.out.println(sums);
         int maxSum = 0;
 
         for (int i = 0; i < sums.size(); i++) {
             if (sums.get(i) > sums.get(maxSum)) maxSum = i;
         }
         return answers[maxSum];
+    }
+
+    private int calcMoE(int num) {
+        if (num > 25 && num < 50) num -= 25;
+        else if (num < 75) num -= 50;
+        else if (num < 100) num -= 75;
+
+        double expo = (-(0.20802) * num) + 6.41132;
+        double numerator = 253.996, denominator = 22.1472 + Math.pow(Math.E, expo);
+        return (int) Math.round(numerator / denominator);
     }
 
     private int getSumOfNWPixels(short[][] pixels, int row, int col) {
@@ -94,7 +114,6 @@ public class AnswerFilter implements PixelFilter {
                 iChannels[c][row][i] = (short) boxColor[c];
                 iChannels[c][row + dist][i] = (short) boxColor[c];
             }
-
         }
     }
 }
