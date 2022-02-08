@@ -38,7 +38,7 @@ public class OpticalMarkReaderMain {
 
         gradeAnswer(allAnswers, testGrades);
         createCSV(testGrades, allIDs);
-        // outputItemAnalysis(testGrades);
+        outputItemAnalysis(testGrades);
     }
 
     private static void gradeAnswer(ArrayList<ArrayList<String>> allAnswers, ArrayList<ArrayList<Boolean>> testGrades) {
@@ -91,8 +91,10 @@ public class OpticalMarkReaderMain {
         try {
             PrintWriter out = new PrintWriter(new FileWriter("itemanalysis.csv"));
             for (int i = 0; i < itemAnalysis.length; i++) {
-                out.println(i + ", " + itemAnalysis[i]);
+                if (itemAnalysis[0] != 0)
+                    out.println("Question " + i + " was gotten wrong " + itemAnalysis[i] + " times.");
             }
+            out.println("Analysis Complete!");
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
