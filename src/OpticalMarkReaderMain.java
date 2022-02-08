@@ -29,13 +29,22 @@ public class OpticalMarkReaderMain {
             allAnswers.add(answers);
             allIDs.add(IDs);
         }
-        ArrayList<String> answerKey = allAnswers.get(0);
-        outputCSV(allAnswers, allIDs, answerKey);
+
+        outputCSV(allAnswers, allIDs);
     }
 
-    private static void outputCSV(ArrayList<ArrayList<String>> allAnswers, ArrayList<ArrayList<String>> allIDs, ArrayList<String> answerKey) {
+    private static void outputCSV(ArrayList<ArrayList<String>> allAnswers, ArrayList<ArrayList<String>> allIDs) {
         ArrayList<ArrayList<Boolean>> testGrades = new ArrayList<>();
-        for (int i = 0; i < allAnswers.size(); i++) {
+
+        gradeAnswer(allAnswers, testGrades);
+        createCSV(testGrades, allIDs);
+        // outputItemAnalysis(testGrades);
+    }
+
+    private static void gradeAnswer(ArrayList<ArrayList<String>> allAnswers, ArrayList<ArrayList<Boolean>> testGrades) {
+        ArrayList<String> answerKey = allAnswers.get(0);
+
+        for (int i = 1; i < allAnswers.size(); i++) {
             ArrayList<Boolean> testGrade = new ArrayList<>();
             ArrayList<String> currPage = allAnswers.get(i);
 
@@ -46,31 +55,35 @@ public class OpticalMarkReaderMain {
 
             testGrades.add(testGrade);
         }
+    }
+
+    private static void createCSV(ArrayList<ArrayList<Boolean>> testGrades, ArrayList<ArrayList<String>> allIDs) {
         try {
             PrintWriter out = new PrintWriter(new FileWriter("answers.csv"));
+            int IDCounter = 0;
             for (ArrayList<Boolean> testGrade : testGrades) {
-                int counter = 0;
-                int IDCounter = 0;
+                int correct = 0;
                 out.println("Student ID: " + allIDs.get(IDCounter).get(0) + " Teacher ID: " + allIDs.get(IDCounter).get(1) + " ");
                 IDCounter++;
+
                 for (Boolean answer : testGrade) {
-                    if (answer) counter++;
+                    if (answer) correct++;
                     out.print(answer + ", ");
                 }
-                out.println(counter + "/" + testGrade.size() + ", " + (((double) counter / testGrade.size()) * 100) + "%");
+
+                out.println("\nCorrect Answers: " + correct + "/" + testGrade.size() + ", Score: " + (((double) correct / testGrade.size()) * 100) + "%\n");
             }
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        outputItemAnalysis(testGrades);
     }
 
     private static void outputItemAnalysis(ArrayList<ArrayList<Boolean>> testGrades) {
         int[] itemAnalysis = new int[testGrades.get(0).size()];
         for (int i = 1; i < testGrades.size(); i++) {
             for (int j = 0; j < testGrades.get(i).size(); j++) {
-                if (testGrades.get(i).get(j) == false) {
+                if (!testGrades.get(i).get(j)) {
                     itemAnalysis[j]++;
                 }
             }
