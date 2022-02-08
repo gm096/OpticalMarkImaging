@@ -33,7 +33,6 @@ public class AnswerFilter {
         // Teacher ID
         IDs.add(getTeacherID(pixels));
     }
-    
 
     private String getTeacherID(short[][] pixels) {
         String teacherID = "";
@@ -50,7 +49,7 @@ public class AnswerFilter {
                 if (sums.get(i) > sums.get(maxSum)) maxSum = i;
             }
 
-            teacherID += (maxSum+1);
+            teacherID += (maxSum + 1);
         }
         return teacherID;
     }
@@ -70,20 +69,20 @@ public class AnswerFilter {
                 if (sums.get(i) > sums.get(maxSum)) maxSum = i;
             }
 
-            studentId += (maxSum+1);
+            studentId += (maxSum + 1);
         }
         return studentId;
     }
 
     private void generateAnswers(short[][] pixels, ArrayList<String> answers, short[][][] cChannels) {
-        int count = 1;
+        int debug = 1;
 
         for (int c = startingX; c < endingX; c += xODist) {
             for (int r = startingY; r < endingY; r += dist) {
-                String ans = getAnswer(pixels, r - calcMoE(count), c, count);
+                String ans = getAnswer(pixels, r - calcMoE(debug), c, debug);
                 answers.add(ans);
                 makeBox(cChannels, r, c);
-                count++;
+                debug++;
             }
         }
     }
@@ -91,13 +90,13 @@ public class AnswerFilter {
     private String getAnswer(short[][] pixels, int row, int col, int debug) {
         String[] answers = {"A", "B", "C", "D", "E"};
         ArrayList<Integer> sums = new ArrayList<>();
-        for (int c = col + 60; c < col + 60 + (dist * numAnswers); c += dist) {
+        for (int c = col + 55; c < col + 55 + (dist * numAnswers); c += dist) {
             int sum = getSumOfNWPixels(pixels, row + cRadius, c);
             // if (debug == 74) System.out.println((row + cRadius) + " " + (c) + " ");
             sums.add(sum);
         }
 
-        // if (debug == 50) System.out.println(sums);
+        // if (debug == 74) System.out.println(sums);
         int maxSum = 0;
 
         for (int i = 0; i < sums.size(); i++) {
@@ -118,8 +117,8 @@ public class AnswerFilter {
 
     private int getSumOfNWPixels(short[][] pixels, int row, int col) {
         int sum = 0;
-        for (int i = row; i < row + (cRadius * 2); i++) {
-            for (int j = col; j < col + (cRadius * 2); j++) {
+        for (int i = row; i < row + (cRadius * 2) + 5; i++) {
+            for (int j = col; j < col + (cRadius * 2) + 5; j++) {
                 if (inBound(pixels, i, j)) {
                     if (pixels[i][j] != 255) sum++;
                 }
