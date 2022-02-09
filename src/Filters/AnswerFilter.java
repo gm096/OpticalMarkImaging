@@ -3,16 +3,26 @@ package Filters;
 import Interfaces.PixelFilter;
 import core.DImage;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 public class AnswerFilter {
-    private final int cRadius = 9, dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble
-    private final int xODist = 281; // dimensions of outer box
-    private final int startingX = 83, startingY = 455;
-    private final int endingX = 4 * xODist + startingX, endingY = 25 * dist + startingY;
-    private final int numAnswers = 5;
+    int rows,cols,startingX,startingY,xODist,numAnswers,cRadius,dist,endingX,endingY;
 
+    public AnswerFilter(String input){
+        cols = Integer.parseInt(input.split(" ")[0]);
+        rows = Integer.parseInt(input.split(" ")[1]);
+        startingX = Integer.parseInt(input.split(" ")[2]);
+        startingY = Integer.parseInt(input.split(" ")[3]);
+        xODist = Integer.parseInt(input.split(" ")[4]);
+        numAnswers = Integer.parseInt(input.split(" ")[5]);
+        cRadius = 9;
+        dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble;
+        endingX = cols * xODist + startingX;
+        endingY = rows * dist + startingY;
 
+    }
     public DImage processImage(DImage img, ArrayList<String> answers, ArrayList<String> IDs) {
         short[][] pixels = img.getBWPixelGrid();
         short[][] outputPixels = new short[pixels.length / 2][pixels[0].length / 2];
@@ -33,6 +43,7 @@ public class AnswerFilter {
         // Teacher ID
         IDs.add(getTeacherID(pixels));
     }
+    
 
     private String getTeacherID(short[][] pixels) {
         String teacherID = "";
@@ -49,7 +60,7 @@ public class AnswerFilter {
                 if (sums.get(i) > sums.get(maxSum)) maxSum = i;
             }
 
-            teacherID += (maxSum + 1);
+            teacherID += (maxSum+1);
         }
         return teacherID;
     }
@@ -69,20 +80,20 @@ public class AnswerFilter {
                 if (sums.get(i) > sums.get(maxSum)) maxSum = i;
             }
 
-            studentId += (maxSum + 1);
+            studentId += (maxSum+1);
         }
         return studentId;
     }
 
     private void generateAnswers(short[][] pixels, ArrayList<String> answers, short[][][] cChannels) {
-        int debug = 1;
+        int count = 1;
 
         for (int c = startingX; c < endingX; c += xODist) {
             for (int r = startingY; r < endingY; r += dist) {
-                String ans = getAnswer(pixels, r - calcMoE(debug), c, debug);
+                String ans = getAnswer(pixels, r - calcMoE(count), c, count);
                 answers.add(ans);
                 makeBox(cChannels, r, c);
-                debug++;
+                count++;
             }
         }
     }
@@ -90,13 +101,13 @@ public class AnswerFilter {
     private String getAnswer(short[][] pixels, int row, int col, int debug) {
         String[] answers = {"A", "B", "C", "D", "E"};
         ArrayList<Integer> sums = new ArrayList<>();
-        for (int c = col + 55; c < col + 55 + (dist * numAnswers); c += dist) {
+        for (int c = col + 60; c < col + 60 + (dist * numAnswers); c += dist) {
             int sum = getSumOfNWPixels(pixels, row + cRadius, c);
             // if (debug == 74) System.out.println((row + cRadius) + " " + (c) + " ");
             sums.add(sum);
         }
 
-        // if (debug == 74) System.out.println(sums);
+        // if (debug == 50) System.out.println(sums);
         int maxSum = 0;
 
         for (int i = 0; i < sums.size(); i++) {
@@ -117,8 +128,8 @@ public class AnswerFilter {
 
     private int getSumOfNWPixels(short[][] pixels, int row, int col) {
         int sum = 0;
-        for (int i = row; i < row + (cRadius * 2) + 5; i++) {
-            for (int j = col; j < col + (cRadius * 2) + 5; j++) {
+        for (int i = row; i < row + (cRadius * 2); i++) {
+            for (int j = col; j < col + (cRadius * 2); j++) {
                 if (inBound(pixels, i, j)) {
                     if (pixels[i][j] != 255) sum++;
                 }
