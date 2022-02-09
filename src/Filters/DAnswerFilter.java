@@ -104,7 +104,7 @@ public class DAnswerFilter implements PixelFilter, Interactive, Drawable {
         try {
             PrintWriter out = new PrintWriter(new FileWriter("format.csv"));
 
-            out.println(columns + " " + rows + " " + startingX + " " + startingY + " " + xODist + " " + answers);
+            out.println(columns + " " + rows + " " + startingX + " " + startingY + " " + xODist + " " + yDist + " " + answers);
 
             out.close();
         } catch (Exception e) {
