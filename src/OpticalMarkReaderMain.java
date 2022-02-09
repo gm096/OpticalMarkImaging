@@ -1,7 +1,6 @@
 import FileIO.PDFHelper;
 import Filters.AnswerFilter;
 import core.DImage;
-import jogamp.graph.font.typecast.ot.table.ID;
 import processing.core.PImage;
 
 import javax.swing.*;
@@ -9,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class OpticalMarkReaderMain {
     public static void main(String[] args) {
