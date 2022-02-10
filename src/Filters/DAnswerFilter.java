@@ -35,15 +35,32 @@ public class DAnswerFilter implements PixelFilter, Interactive, Drawable {
         short[][] outputPixels = new short[pixels.length / 2][pixels[0].length / 2];
         short[][][] iChannels = {img.getRedChannel(), img.getGreenChannel(), img.getBlueChannel()};
         short[][][] oChannels = {new short[outputPixels.length][outputPixels[0].length], new short[outputPixels.length][outputPixels[0].length], new short[outputPixels.length][outputPixels[0].length]};
+        short[][] alphaChannel = new short[outputPixels.length][outputPixels[0].length];
 
 
         downsampleImage(iChannels, oChannels);
-        if (corners.size() >= 2) boxImage(oChannels);
+        if (corners.size() >= 2) {
+            boxImage(oChannels);
+            tintBox(alphaChannel, oChannels);
+        }
 
         DImage nImg = new DImage(outputPixels[0].length, outputPixels.length);
         nImg.setPixels(outputPixels);
+        nImg.setAlphaChannel(alphaChannel);
         nImg.setColorChannels(oChannels[0], oChannels[1], oChannels[2]);
         return nImg;
+    }
+
+    private void tintBox(short[][] alphaChannel, short[][][] oChannels) {
+        for (int c = startingX / 2; c < startingX / 2 + xODist / 2; c++) {
+            for (int r = startingY / 2; r < startingY / 2 + yDist / 2; r++) {
+                alphaChannel[r][c] = 255;
+
+                oChannels[1][r][c] = 120;
+                oChannels[2][r][c] = 120;
+                alphaChannel[r][c] = 128;
+            }
+        }
     }
 
     private void boxImage(short[][][] cChannels) {
@@ -58,8 +75,8 @@ public class DAnswerFilter implements PixelFilter, Interactive, Drawable {
         int[] boxColor = {255, 0, 0};
         for (int c = 0; c < boxColor.length; c++) {
             for (int i = row; i <= row + yDist / 2; i++) {
-                if (inBound(iChannels[0], i, col))   iChannels[c][i][col] = (short) boxColor[c];
-                if (inBound(iChannels[0], i, col + xODist / 2))  iChannels[c][i][col + xODist / 2] = (short) boxColor[c];
+                if (inBound(iChannels[0], i, col)) iChannels[c][i][col] = (short) boxColor[c];
+                if (inBound(iChannels[0], i, col + xODist / 2)) iChannels[c][i][col + xODist / 2] = (short) boxColor[c];
             }
 
             for (int i = col; i <= col + xODist / 2; i++) {
