@@ -1,38 +1,38 @@
 package Filters;
 
-import Interfaces.PixelFilter;
 import core.DImage;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 public class AnswerFilter {
-    int rows,cols,startingX,startingY,xODist,numAnswers,cRadius,dist,endingX,endingY;
+    private final int cRadius = 9; // radius of bubbles
+    private final int xODist, dist; // dimensions of outer box
+    private final int startingX, startingY, endingX, endingY; // starting and ending locations of the pdf
+    private final int numAnswers; // answers per question
 
-    public AnswerFilter(String input){
-        cols = Integer.parseInt(input.split(" ")[0]);
-        rows = Integer.parseInt(input.split(" ")[1]);
-        startingX = Integer.parseInt(input.split(" ")[2]);
-        startingY = Integer.parseInt(input.split(" ")[3]);
-        xODist = Integer.parseInt(input.split(" ")[4]);
-        numAnswers = Integer.parseInt(input.split(" ")[5]);
-        cRadius = 9;
-        dist = (2 * cRadius) + 20; // radius of bubbles and space between each bubble;
-        endingX = cols * xODist + startingX;
-        endingY = rows * dist + startingY;
 
+    public AnswerFilter(String[] values) {
+        int rows = Integer.parseInt(values[0].trim());
+        int columns = Integer.parseInt(values[1].trim());
+
+        startingX = Integer.parseInt(values[2].trim());
+        startingY = Integer.parseInt(values[3].trim());
+
+        xODist = Integer.parseInt(values[4].trim());
+        dist = Integer.parseInt(values[5].trim());
+
+        numAnswers = Integer.parseInt(values[6].trim());
+
+        endingX = rows * xODist + startingX;
+        endingY = columns * dist + startingY;
     }
+
     public DImage processImage(DImage img, ArrayList<String> answers, ArrayList<String> IDs) {
         short[][] pixels = img.getBWPixelGrid();
-        short[][] outputPixels = new short[pixels.length / 2][pixels[0].length / 2];
-        short[][][] cChannels = {img.getRedChannel(), img.getGreenChannel(), img.getBlueChannel()};
 
-        generateAnswers(pixels, answers, cChannels);
+        generateAnswers(pixels, answers);
         generateIDs(pixels, IDs);
 
-        downsampleImage(pixels, outputPixels);
-        img.setPixels(outputPixels);
         return img;
     }
 
@@ -43,7 +43,6 @@ public class AnswerFilter {
         // Teacher ID
         IDs.add(getTeacherID(pixels));
     }
-    
 
     private String getTeacherID(short[][] pixels) {
         String teacherID = "";
@@ -60,7 +59,7 @@ public class AnswerFilter {
                 if (sums.get(i) > sums.get(maxSum)) maxSum = i;
             }
 
-            teacherID += (maxSum+1);
+            teacherID += (maxSum + 1);
         }
         return teacherID;
     }
@@ -80,34 +79,33 @@ public class AnswerFilter {
                 if (sums.get(i) > sums.get(maxSum)) maxSum = i;
             }
 
-            studentId += (maxSum+1);
+            studentId += (maxSum + 1);
         }
         return studentId;
     }
 
-    private void generateAnswers(short[][] pixels, ArrayList<String> answers, short[][][] cChannels) {
-        int count = 1;
+    private void generateAnswers(short[][] pixels, ArrayList<String> answers) {
+        int debug = 1;
 
         for (int c = startingX; c < endingX; c += xODist) {
             for (int r = startingY; r < endingY; r += dist) {
-                String ans = getAnswer(pixels, r - calcMoE(count), c, count);
+                String ans = getAnswer(pixels, r - calcMoE(debug), c, debug);
                 answers.add(ans);
-                makeBox(cChannels, r, c);
-                count++;
+                debug++;
             }
         }
     }
 
     private String getAnswer(short[][] pixels, int row, int col, int debug) {
-        String[] answers = {"A", "B", "C", "D", "E"};
+        String[] answers = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
         ArrayList<Integer> sums = new ArrayList<>();
-        for (int c = col + 60; c < col + 60 + (dist * numAnswers); c += dist) {
+        for (int c = col + 55; c < col + 55 + (dist * numAnswers); c += dist) {
             int sum = getSumOfNWPixels(pixels, row + cRadius, c);
             // if (debug == 74) System.out.println((row + cRadius) + " " + (c) + " ");
             sums.add(sum);
         }
 
-        // if (debug == 50) System.out.println(sums);
+        // if (debug == 74) System.out.println(sums);
         int maxSum = 0;
 
         for (int i = 0; i < sums.size(); i++) {
@@ -128,8 +126,8 @@ public class AnswerFilter {
 
     private int getSumOfNWPixels(short[][] pixels, int row, int col) {
         int sum = 0;
-        for (int i = row; i < row + (cRadius * 2); i++) {
-            for (int j = col; j < col + (cRadius * 2); j++) {
+        for (int i = row; i < row + (cRadius * 2) + 5; i++) {
+            for (int j = col; j < col + (cRadius * 2) + 5; j++) {
                 if (inBound(pixels, i, j)) {
                     if (pixels[i][j] != 255) sum++;
                 }
@@ -141,34 +139,5 @@ public class AnswerFilter {
 
     public static boolean inBound(short[][] arr, int r, int c) {
         return (arr.length - 1 >= r && arr[0].length - 1 >= c && r >= 0 && c >= 0);
-    }
-
-    private void downsampleImage(short[][] pixels, short[][] outputPixels) {
-        int rc = 0;
-        int cc = 0;
-
-        for (int r = 0; r < pixels.length - 1; r += 2) {
-            for (int c = 0; c < pixels[r].length - 1; c += 2) {
-                outputPixels[rc][cc] = pixels[r][c];
-                cc++;
-            }
-            rc++;
-            cc = 0;
-        }
-    }
-
-    private void makeBox(short[][][] iChannels, int row, int col) {
-        int[] boxColor = {255, 0, 0};
-        for (int c = 0; c < boxColor.length; c++) {
-            for (int i = row; i <= row + dist; i++) {
-                iChannels[c][i][col] = (short) boxColor[c];
-                iChannels[c][i][col + xODist] = (short) boxColor[c];
-            }
-
-            for (int i = col; i <= col + xODist; i++) {
-                iChannels[c][row][i] = (short) boxColor[c];
-                iChannels[c][row + dist][i] = (short) boxColor[c];
-            }
-        }
     }
 }
