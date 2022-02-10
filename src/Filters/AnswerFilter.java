@@ -3,6 +3,7 @@ package Filters;
 import core.DImage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AnswerFilter {
     private final int cRadius = 9; // radius of bubbles
@@ -105,13 +106,25 @@ public class AnswerFilter {
             sums.add(sum);
         }
 
-        // if (debug == 74) System.out.println(sums);
+        // if (debug == 3) System.out.println(sums);
         int maxSum = 0;
 
         for (int i = 0; i < sums.size(); i++) {
             if (sums.get(i) > sums.get(maxSum)) maxSum = i;
         }
+
+        int avgDist = getAvgDist(sums, maxSum);
+        if (avgDist <= 5) return answers[numAnswers];
+
         return answers[maxSum];
+    }
+
+    private int getAvgDist(ArrayList<Integer> sums, int maxSum) {
+        int s = 0;
+        for (int i = 0; i < sums.size(); i++) {
+            s += sums.get(maxSum) - sums.get(i);
+        }
+        return s / 4;
     }
 
     private int calcMoE(int num) {
@@ -140,4 +153,5 @@ public class AnswerFilter {
     public static boolean inBound(short[][] arr, int r, int c) {
         return (arr.length - 1 >= r && arr[0].length - 1 >= c && r >= 0 && c >= 0);
     }
+
 }
