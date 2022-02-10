@@ -10,19 +10,19 @@ public class FilterTest {
     public static String currentFolder = System.getProperty("user.dir") + "/";
 
     public static void main(String[] args) {
-        // DisplayWindow.showFor("assets/page1.png", 1000, 1000);
+        DisplayWindow.showFor("assets/page1.png", 1000, 1000);
 
-        RunTheFilter();
+        // RunTheFilter();
     }
 
     private static void RunTheFilter() {
-        PImage in = PDFHelper.getPageImage("assets/omrtest.pdf", 2);
+        PImage in = PDFHelper.getPageImage("assets/omrtest.pdf", 0);
         DImage img = new DImage(in);       // you can make a DImage from a PImage
 
         ArrayList<String> answers = new ArrayList<>();
         ArrayList<String> IDs = new ArrayList<>();
 
-        AnswerFilter aFilter = new AnswerFilter();
+        AnswerFilter aFilter = new AnswerFilter(new String[]{"4", "25", "83", "455", "281", "38", "5"});
         aFilter.processImage(img, answers, IDs);
 
         checkAnswers(answers);
