@@ -21,7 +21,7 @@ public class PDFHelper {
      * @return a List of PImage objects corresponding to the pages of the pdf
      */
     public static ArrayList<PImage> getPImagesFromPdf(String path) {
-//        InputStream is = PDFHelper.class.getResourceAsStream(path);
+        // InputStream is = PDFHelper.class.getResourceAsStream(path);
         ArrayList<PImage> images = new ArrayList<PImage>();
         PDDocument pdf = null;
 
@@ -46,12 +46,12 @@ public class PDFHelper {
                 img.updatePixels();
 
                 images.add(img);
-                System.out.println("Adding page " + images.size());
             } catch (IOException e) {
                 System.out.println("problem converting to image");
                 e.printStackTrace();
             }
         }
+        System.out.println("Added " + images.size() + " pages");
 
         try {
             pdf.close();
