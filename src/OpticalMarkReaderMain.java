@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class OpticalMarkReaderMain {
     public static void main(String[] args) {
@@ -109,7 +108,7 @@ public class OpticalMarkReaderMain {
             PrintWriter out = new PrintWriter(new FileWriter("itemanalysis.csv"));
             for (int i = 0; i < itemAnalysis.length; i++) {
                 if (itemAnalysis[i] != 0)
-                    out.println("Question " + i + " was gotten wrong " + itemAnalysis[i] + " times.");
+                    out.println("Question " + (i + 1) + " was gotten wrong " + itemAnalysis[i] + " times.");
             }
             out.println("Analysis Complete!");
             out.close();
